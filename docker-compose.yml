@@ -1,15 +1,34 @@
 services:
     n8n:
+        # 使用するDockerイメージとそのバージョンを指定
+        # ここではn8nの公式イメージのバージョン1.91.1を使用
         image: n8nio/n8n:1.91.1
+
+        # コンテナが停止された場合の再起動方針を指定
+        # 'unless-stopped' は「手動で止めない限り自動で再起動」する設定
         restart: unless-stopped
+
+        # ホストとコンテナのポートのマッピング
+        # ホストの5678ポートにアクセスすると、コンテナの5678ポートに転送される
         ports:
             - '5678:5678'
+
         environment:
+            # 環境変数の設定（.envファイルの値を使用）
+            # タイムゾーン（TZ）を指定。指定されていなければデフォルトで Asia/Tokyo を使用
             - TZ=${TZ:-Asia/Tokyo}
+
+            # 認証情報などを暗号化するための鍵。必ず32バイトのランダム文字列を設定
             - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+
         volumes:
+            # ホスト側のボリューム 'n8n-data' を
+            # コンテナ内の /home/node/.n8n にマウント
+            # このディレクトリはn8nのワークフローや認証情報などが保存される場所
             - n8n-data:/home/node/.n8n
 
 volumes:
+    # ボリューム 'n8n-data' を定義。Dockerがホスト上に永続ストレージを管理
     n8n-data:
-        driver: local
+        driver: local  # デフォルトのローカルボリュームドライバを使用
+
